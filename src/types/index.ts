@@ -33,6 +33,8 @@ export interface Vehicle {
   weight: number // kg
   drivetrain: 'RWD' | 'AWD' | 'FWD' | 'MR'
   fuelType: 'petrol' | 'electric' | 'hybrid'
+  imageUrl?: string
+  galleryUrls?: string[]
   color: string
   colorHex: string
   colorTheme: {

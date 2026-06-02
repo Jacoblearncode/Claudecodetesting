@@ -1,62 +1,57 @@
 'use client'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, Zap, Gauge, Timer } from 'lucide-react'
 import { getFeaturedVehicles } from '@/data/vehicles'
+import { Vehicle } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import { staggerContainer, fadeInUp } from '@/lib/animations'
 
-function VehicleVisual({ vehicle }: { vehicle: ReturnType<typeof getFeaturedVehicles>[0] }) {
+function VehicleVisual({ vehicle }: { vehicle: Vehicle }) {
+  const [imgError, setImgError] = useState(false)
   const { primary, secondary, accent } = vehicle.colorTheme
+
+  if (vehicle.imageUrl && !imgError) {
+    return (
+      <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-lg">
+        <Image
+          src={vehicle.imageUrl}
+          alt={`${vehicle.make} ${vehicle.model}`}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          onError={() => setImgError(true)}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-apex-void/70 via-transparent to-transparent" />
+        <div className="absolute top-3 right-3 px-3 py-1.5 bg-black/50 backdrop-blur-sm border border-white/10 rounded">
+          <span className="text-white text-xs font-bold">{formatCurrency(vehicle.pricePerDay)}</span>
+          <span className="text-white/50 text-xs"> / day</span>
+        </div>
+      </div>
+    )
+  }
+
+  // Gradient fallback
   return (
     <div
       className="relative w-full aspect-[16/9] rounded-t-lg overflow-hidden"
       style={{ background: `linear-gradient(135deg, ${primary} 0%, ${secondary} 100%)` }}
     >
-      {/* Decorative circuit lines */}
-      <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid slice">
-        <line x1="0" y1="80" x2="150" y2="80" stroke="white" strokeWidth="0.5" />
-        <line x1="150" y1="80" x2="180" y2="50" stroke="white" strokeWidth="0.5" />
-        <line x1="180" y1="50" x2="400" y2="50" stroke="white" strokeWidth="0.5" />
-        <line x1="0" y1="160" x2="100" y2="160" stroke="white" strokeWidth="0.5" />
-        <line x1="100" y1="160" x2="130" y2="130" stroke="white" strokeWidth="0.5" />
-        <line x1="130" y1="130" x2="400" y2="130" stroke="white" strokeWidth="0.5" />
-        <circle cx="150" cy="80" r="3" fill="white" opacity="0.4" />
-        <circle cx="130" cy="130" r="3" fill="white" opacity="0.4" />
-      </svg>
-
-      {/* Accent glow */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full blur-3xl opacity-20"
-        style={{ background: accent }}
-      />
-
-      {/* Car silhouette */}
       <div className="absolute inset-0 flex items-center justify-center">
         <svg viewBox="0 0 320 130" className="w-3/4 opacity-90" fill="none">
           <path d="M20 90 L55 90 L65 70 L90 58 L170 54 L220 54 L260 62 L285 78 L300 90 L310 90 L312 100 L18 100 Z" fill="white" fillOpacity="0.85"/>
           <path d="M93 54 L108 36 L150 28 L200 28 L228 36 L240 54 Z" fill="white" fillOpacity="0.6"/>
-          <path d="M112 28 L135 14 L175 10 L210 14 L228 28 Z" fill="white" fillOpacity="0.25"/>
           <circle cx="78" cy="103" r="20" fill="white" fillOpacity="0.9"/>
           <circle cx="78" cy="103" r="11" fill={secondary} />
-          <circle cx="78" cy="103" r="4" fill="white" fillOpacity="0.5"/>
           <circle cx="242" cy="103" r="20" fill="white" fillOpacity="0.9"/>
           <circle cx="242" cy="103" r="11" fill={secondary} />
-          <circle cx="242" cy="103" r="4" fill="white" fillOpacity="0.5"/>
-          <path d="M268 72 L308 72 L308 90 L268 86 Z" fill="white" fillOpacity="0.3"/>
-          <path d="M20 78 L50 78 L47 65 L23 67 Z" fill="white" fillOpacity="0.25"/>
-          <rect x="100" y="32" width="120" height="22" rx="2" fill="white" fillOpacity="0.1"/>
         </svg>
       </div>
-
-      {/* Brand accent line */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-0.5 opacity-60"
-        style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
-      />
-
-      {/* Price badge */}
-      <div className="absolute top-4 right-4 px-3 py-1.5 bg-black/50 backdrop-blur-sm border border-white/10 rounded">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full blur-3xl opacity-20" style={{ background: accent }} />
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 opacity-60" style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
+      <div className="absolute top-3 right-3 px-3 py-1.5 bg-black/50 backdrop-blur-sm border border-white/10 rounded">
         <span className="text-white text-xs font-bold">{formatCurrency(vehicle.pricePerDay)}</span>
         <span className="text-white/50 text-xs"> / day</span>
       </div>
@@ -77,7 +72,6 @@ export default function FeaturedVehicles() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -103,7 +97,6 @@ export default function FeaturedVehicles() {
           </Link>
         </motion.div>
 
-        {/* Vehicle grid */}
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -132,7 +125,6 @@ export default function FeaturedVehicles() {
                       </span>
                     </div>
 
-                    {/* Specs row */}
                     <div className="flex items-center gap-4 py-3 border-y border-apex-border/50 mb-4">
                       <div className="flex items-center gap-1.5 text-xs text-apex-silver">
                         <Zap className="w-3.5 h-3.5 text-apex-red" />

@@ -2,6 +2,7 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import VehicleCard from '@/components/fleet/VehicleCard'
+import CompareBar from '@/components/fleet/CompareBar'
 import FleetFilters, { FilterState } from '@/components/fleet/FleetFilters'
 import { vehicles } from '@/data/vehicles'
 import { staggerContainer, fadeInUp } from '@/lib/animations'
@@ -119,6 +120,8 @@ export default function FleetPage() {
           </motion.div>
         )}
       </div>
+
+      <CompareBar />
     </div>
   )
 }
